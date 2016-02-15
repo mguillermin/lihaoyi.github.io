@@ -427,7 +427,7 @@ handle(foo.x)
 
 def handle(exp: Exponentiator) = {
   val myDouble = ...
-  ... exp.exponentiate(myDouble) ... // Only one usage of foo
+  ... exp.exponentiate(myDouble) ... // Only one usage of exp
 }
 
 val myExp = new Exponentiator(2)
@@ -443,7 +443,7 @@ handle(myExp)
 
 def handle(op: Double =&gt; Double) = {
   val myDouble = ...
-  ... op(myDouble) ... // Only one usage of foo
+  ... op(myDouble) ... // Only one usage of op
 }
 
 val exp = new Exponentiator(2)
@@ -498,7 +498,7 @@ handle(exp.exponentiate)
 </ol>
 <p>In general, <code>Option</code>s, simple sealed traits, and exceptions are the most common way of dealing with errors. It is likely that different APIs you end up using will be using a mish-mash of these techniques. In general, it makes sense to wrap these mixed errors as soon as possible to put them in some consistent format: e.g. if you decide to use a sealed trait, wrap all known exceptions in a <code>try</code>-<code>catch</code> and convert the <code>Some</code>/<code>None</code> of <code>Option</code> returning functions into the relevant subclasses of your sealed trait. If you decide to use exceptions, use <code>Option.getOrElse(throw new MyCustomException)</code> to convert any <code>Option</code>s into better-named exceptions.</p><h3 id="Option">Option</h3>
 <p>This is the simplest possible mechanism for returning errors from a function: you either get a <code>Some</code> containing the result, or you get a <code>None</code> containing nothing.</p>
-<p>This works great in simple cases, for example <code>Map[K, V]#get(k: K)</code> returns <code>Option[T]</code> because there's really only one thing that could have gone wrong: the key doesn't exist. There's nothing to say about <em>why</em> the key doesn't exist, and there's no other thing that could have gone wrong. This is the ideal use case for an <code>Option</code>. You can also us <code>for</code>-comprehensions or <code>map</code>/<code>flatMap</code> to chain them and easily propagate failures.</p>
+<p>This works great in simple cases, for example <code>Map[K, V]#get(k: K)</code> returns <code>Option[T]</code> because there's really only one thing that could have gone wrong: the key doesn't exist. There's nothing to say about <em>why</em> the key doesn't exist, and there's no other thing that could have gone wrong. This is the ideal use case for an <code>Option</code>. You can also use <code>for</code>-comprehensions or <code>map</code>/<code>flatMap</code> to chain them and easily propagate failures.</p>
 <p>The downside of using <code>Option</code>s is that it doesn't give you any place to put the more information about the error. If you need to distinguish between multiple failures, e.g. to display error messages to a user, you need something more powerful. You could return <code>Option[Option[T]]</code> or even <code>Option[Option[Option[T]]]</code> to deal with a small fixed set of errors, but it probably makes more sense to define your own custom sealed trait to use as a return value.</p><h3 id="SimpleSealedTrait">Simple Sealed Trait</h3>
 <p>When <code>Option[T]</code> isn't flexible enough, you may fall back to defining a custom sealed trait to represent errors. For example:</p>
 <pre><code class="scala">sealed trait Result
